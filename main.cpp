@@ -20,8 +20,14 @@ int main()
     {
         double call = blackScholes(CALL, cases[i].S, cases[i].K, cases[i].T, cases[i].r, cases[i].sigma);
         double put = blackScholes(PUT, cases[i].S, cases[i].K, cases[i].T, cases[i].r, cases[i].sigma);
+
+        double monteCarloCall = monteCarlo(CALL, cases[i].S, cases[i].K, cases[i].T, cases[i].r, cases[i].sigma, 1'000'000);
+        double monteCarloPut = monteCarlo(PUT, cases[i].S, cases[i].K, cases[i].T, cases[i].r, cases[i].sigma, 1'000'000);
+
         std::cout << "Test Case " << (i + 1) << ": "
                   << "Call = " << call << ", Put = " << put << std::endl;
+
+        cout << "monteCarloCall: " << monteCarloCall << " " << "monteCarloPut: " << monteCarloPut << "\n";
     }
 
     return 0;
