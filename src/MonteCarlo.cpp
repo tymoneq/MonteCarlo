@@ -5,25 +5,26 @@
 
 using namespace std;
 
-double normalCDF(double x)
+OptionPricing::OptionPricing() : gen(rd()), d(0.0, 1.0)
+{
+}
+
+double OptionPricing::normalCDF(double x)
 {
     return 0.5 * (1.0 + erf(x / sqrt(2.0)));
 }
 
-double genZ()
+double OptionPricing::genZ()
 {
-    random_device rd;
-    mt19937 gen(rd());
-    uniform_real_distribution<double> d(0.0, 1.0);
 
-    double U1 = d(gen);
-    double U2 = d(gen);
+    double U1 = this->d(this->gen);
+    double U2 = this->d(this->gen);
 
     return sqrt(-2.0 * log(U1)) * cos(2 * M_PI * U2);
 }
 
-double blackScholes(const OptionType type, const double &currentStockPrice, const double &strikePrice, const double &timeToMaturity,
-                    const double &riskFreeRate, const double &volatility)
+double OptionPricing::blackScholes(const OptionType type, const double &currentStockPrice, const double &strikePrice, const double &timeToMaturity,
+                                   const double &riskFreeRate, const double &volatility)
 {
 
     double d1 = (log(currentStockPrice / strikePrice) + (riskFreeRate + 0.5 * pow(volatility, 2))) * timeToMaturity / (volatility * sqrt(timeToMaturity));
@@ -40,8 +41,8 @@ double blackScholes(const OptionType type, const double &currentStockPrice, cons
     return price;
 }
 
-double monteCarlo(const OptionType type, const double &currentStockPrice, const double &strikePrice, const double &timeToMaturity,
-                  const double &riskFreeRate, const double &volatility, const int N)
+double OptionPricing::monteCarlo(const OptionType type, const double &currentStockPrice, const double &strikePrice, const double &timeToMaturity,
+                                 const double &riskFreeRate, const double &volatility, const int N)
 {
 
     double meanPayoff = 0.0;
@@ -64,3 +65,5 @@ double monteCarlo(const OptionType type, const double &currentStockPrice, const 
 
     return meanPayoff;
 }
+
+OptionPricing::~OptionPricing() {}
