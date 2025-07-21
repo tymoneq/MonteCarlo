@@ -3,6 +3,7 @@
 #include <cmath>
 #include <random>
 #include <fstream>
+#include <sstream>
 
 using namespace std;
 
@@ -42,14 +43,17 @@ double OptionPricing::blackScholes(const OptionType type, const double &currentS
     return price;
 }
 
-double OptionPricing::monteCarlo(const OptionType type, const double &currentStockPrice, const double &strikePrice, const double &timeToMaturity,
-                                 const double &riskFreeRate, const double &volatility, const int N, const string &outputFile)
+void OptionPricing::monteCarlo(const OptionType type, const double &currentStockPrice, const double &strikePrice, const double &timeToMaturity,
+                               const double &riskFreeRate, const double &volatility, const int N, const string &outputFile)
 {
-
-    double meanPayoff = 0.0;
 
     ofstream outFile(outputFile);
 
+    ostringstream buffer;
+    buffer.precision(6);
+    buffer << fixed;
+
+    // vector<double> results(N);
     for (int i = 0; i < N; i++)
     {
         double Si = currentStockPrice * exp((riskFreeRate - 0.5 * pow(volatility, 2)) * timeToMaturity + volatility * sqrt(timeToMaturity) * genZ());
@@ -59,17 +63,14 @@ double OptionPricing::monteCarlo(const OptionType type, const double &currentSto
 
         else if (type == PUT)
             Si = max(strikePrice - Si, 0.0);
-
-        meanPayoff += Si;
-        outFile << Si << "\n";
+        buffer << Si << "\n";
     }
 
-    meanPayoff /= N;
-    meanPayoff *= exp(-riskFreeRate * timeToMaturity);
+    // for (const auto &result : results)
+    //     outFile << result << "\n";
 
+    outFile << buffer.str();
     outFile.close();
-
-    return meanPayoff;
 }
 
 OptionPricing::~OptionPricing() {}

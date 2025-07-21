@@ -4,6 +4,8 @@
 #include <string>
 #include <map>
 #include <filesystem>
+#include <thread>
+#include <functional>
 
 #ifdef _WIN32
 #include <direct.h>
@@ -23,7 +25,9 @@ struct dataFormat
     string optionName;
 };
 
-vector<dataFormat> readData(char *fileName);
+vector<vector<dataFormat>> readData(char *fileName, const int NumberOfThreads);
+
+void getAns(vector<vector<dataFormat>> &data, int id, const int N);
 
 int main(int argc, char *argv[])
 {
@@ -31,8 +35,10 @@ int main(int argc, char *argv[])
     CHDIR("../");
 
     const int N = 1'000'000;
+    const int numberOfThreads = 6;
+
     // argv contains file name
-    vector<dataFormat> optionData = readData(argv[1]);
+    vector<vector<dataFormat>> optionData = readData(argv[1], numberOfThreads);
 
     // creating out directory
 
@@ -44,40 +50,46 @@ int main(int argc, char *argv[])
 
     CHDIR("out/");
 
-    OptionPricing optionPricing;
-
+    // creating file names
     map<string, int> fileNames;
-    for (auto el : optionData)
+
+    for (int i = 0; i < numberOfThreads; i++)
     {
-        // checking the name of the output file
-        if (fileNames[el.optionName] > 0)
+        for (auto &el : optionData[i])
+        {
+
+            fileNames[el.optionName]++;
             el.optionName += to_string(fileNames[el.optionName]);
-
-        fileNames[el.optionName]++;
-
-        double mean = optionPricing.monteCarlo(el.optionType, el.stockData[0], el.stockData[1], el.stockData[2], el.stockData[3], el.stockData[4], N, el.optionName + ".out");
-
-        // cout << mean << "\n";
+        }
     }
+    // creating multithreading
+    vector<thread> threads;
+
+    for (int i = 0; i < numberOfThreads; i++)
+        threads.emplace_back(getAns, ref(optionData), i, N);
+
+    for (auto &t : threads)
+        t.join();
 
     return 0;
 }
 
-vector<dataFormat> readData(char *fileName)
+vector<vector<dataFormat>> readData(char *fileName, const int NumberOfThreads)
 {
     ifstream file(fileName);
     // ifstream file("data.in");
 
-    vector<dataFormat> data;
+    vector<vector<dataFormat>> data(NumberOfThreads);
     const char pattern = ' ';
     string row;
+    int cnt = 0;
     while (getline(file, row))
     {
         dataFormat dataRow;
         // split data
         vector<string> result;
         string tmp;
-        for (int i = 0; i < row.size(); i++)
+        for (long unsigned int i = 0; i < row.size(); i++)
         {
             if (row[i] != pattern)
                 tmp += row[i];
@@ -102,7 +114,7 @@ vector<dataFormat> readData(char *fileName)
 
         dataRow.optionName = result.back();
 
-        for (int i = 1; i < result.size() - 1; i++)
+        for (long unsigned int i = 1; i < result.size() - 1; i++)
         {
             double num = 0.0;
             int power = 1;
@@ -125,10 +137,22 @@ vector<dataFormat> readData(char *fileName)
             dataRow.stockData.emplace_back(num);
         }
 
-        data.emplace_back(dataRow);
+        data[cnt].emplace_back(dataRow);
+        cnt++;
+        cnt %= NumberOfThreads;
     }
 
     file.close();
 
     return data;
+}
+
+void getAns(vector<vector<dataFormat>> &data, int id, const int N)
+{
+    OptionPricing optionPricing;
+
+    for (auto el : data[id])
+    {
+        optionPricing.monteCarlo(el.optionType, el.stockData[0], el.stockData[1], el.stockData[2], el.stockData[3], el.stockData[4], N, el.optionName + ".out");
+    }
 }

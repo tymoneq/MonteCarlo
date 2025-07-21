@@ -19,8 +19,7 @@ listOfFiles = []
 
 for el in currentPath.iterdir():
     tmpEl = str(el)
-    if len(tmpEl) > 3 and tmpEl[-3:] == "out":
-        listOfFiles.append(tmpEl)
+    listOfFiles.append(tmpEl)
 
 
 progress = 0
