@@ -3,6 +3,7 @@
 #include <fstream>
 #include <string>
 #include <map>
+#include <filesystem>
 
 #ifdef _WIN32
 #include <direct.h>
@@ -33,6 +34,16 @@ int main(int argc, char *argv[])
     // argv contains file name
     vector<dataFormat> optionData = readData(argv[1]);
 
+    // creating out directory
+
+    filesystem::path dirPath = "out";
+    if (filesystem::create_directory(dirPath))
+        cout << "Directory created successfully \n";
+    else
+        cout << "Directory already exist \n";
+
+    CHDIR("out/");
+
     OptionPricing optionPricing;
 
     map<string, int> fileNames;
@@ -46,7 +57,7 @@ int main(int argc, char *argv[])
 
         double mean = optionPricing.monteCarlo(el.optionType, el.stockData[0], el.stockData[1], el.stockData[2], el.stockData[3], el.stockData[4], N, el.optionName + ".out");
 
-        cout << mean << "\n";
+        // cout << mean << "\n";
     }
 
     return 0;
