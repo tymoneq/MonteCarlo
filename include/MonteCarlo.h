@@ -22,7 +22,7 @@ public:
                         const double &riskFreeRate, const double &volatility);
 
     double monteCarlo(const OptionType type, const double &currentStockPrice, const double &strikePrice, const double &timeToMaturity,
-                      const double &riskFreeRate, const double &volatility, const int N);
+                      const double &riskFreeRate, const double &volatility, const int N, const string &outputFile);
 
 private:
     random_device rd;

@@ -1,0 +1,12 @@
+[
+{
+  "directory": "/home/tymon/coding/MonteCarlo/build",
+  "command": "/usr/bin/g++ -DDEBUG -I/home/tymon/coding/MonteCarlo/include  -g -O0 -Wall -g -std=gnu++17 -o CMakeFiles/myapp.dir/main.cpp.o -c /home/tymon/coding/MonteCarlo/main.cpp",
+  "file": "/home/tymon/coding/MonteCarlo/main.cpp"
+},
+{
+  "directory": "/home/tymon/coding/MonteCarlo/build",
+  "command": "/usr/bin/g++ -DDEBUG -I/home/tymon/coding/MonteCarlo/include  -g -O0 -Wall -g -std=gnu++17 -o CMakeFiles/myapp.dir/src/MonteCarlo.cpp.o -c /home/tymon/coding/MonteCarlo/src/MonteCarlo.cpp",
+  "file": "/home/tymon/coding/MonteCarlo/src/MonteCarlo.cpp"
+}
+]

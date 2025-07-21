@@ -2,6 +2,7 @@
 #include <string>
 #include <cmath>
 #include <random>
+#include <fstream>
 
 using namespace std;
 
@@ -42,10 +43,12 @@ double OptionPricing::blackScholes(const OptionType type, const double &currentS
 }
 
 double OptionPricing::monteCarlo(const OptionType type, const double &currentStockPrice, const double &strikePrice, const double &timeToMaturity,
-                                 const double &riskFreeRate, const double &volatility, const int N)
+                                 const double &riskFreeRate, const double &volatility, const int N, const string &outputFile)
 {
 
     double meanPayoff = 0.0;
+
+    ofstream outFile(outputFile);
 
     for (int i = 0; i < N; i++)
     {
@@ -58,10 +61,13 @@ double OptionPricing::monteCarlo(const OptionType type, const double &currentSto
             Si = max(strikePrice - Si, 0.0);
 
         meanPayoff += Si;
+        outFile << Si << "\n";
     }
 
     meanPayoff /= N;
     meanPayoff *= exp(-riskFreeRate * timeToMaturity);
+
+    outFile.close();
 
     return meanPayoff;
 }

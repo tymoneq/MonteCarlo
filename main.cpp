@@ -2,6 +2,15 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <map>
+
+#ifdef _WIN32
+#include <direct.h>
+#define CHDIR _chdir
+#else
+#include <unistd.h>
+#define CHDIR chdir
+#endif
 
 using namespace std;
 
@@ -17,24 +26,28 @@ vector<dataFormat> readData(char *fileName);
 
 int main(int argc, char *argv[])
 {
+    // if compaling with CMake
+    CHDIR("../");
+
+    const int N = 1'000'000;
     // argv contains file name
     vector<dataFormat> optionData = readData(argv[1]);
 
-    // OptionPricing optionPricing;
+    OptionPricing optionPricing;
 
-    // for (int i = 0; i < 5; i++)
-    // {
-    //     double call = optionPricing.blackScholes(CALL, cases[i].S, cases[i].K, cases[i].T, cases[i].r, cases[i].sigma);
-    //     double put = optionPricing.blackScholes(PUT, cases[i].S, cases[i].K, cases[i].T, cases[i].r, cases[i].sigma);
+    map<string, int> fileNames;
+    for (auto el : optionData)
+    {
+        // checking the name of the output file
+        if (fileNames[el.optionName] > 0)
+            el.optionName += to_string(fileNames[el.optionName]);
 
-    //     double monteCarloCall = optionPricing.monteCarlo(CALL, cases[i].S, cases[i].K, cases[i].T, cases[i].r, cases[i].sigma, 10'000'000);
-    //     double monteCarloPut = optionPricing.monteCarlo(PUT, cases[i].S, cases[i].K, cases[i].T, cases[i].r, cases[i].sigma, 10'000'000);
+        fileNames[el.optionName]++;
 
-    //     std::cout << "Test Case " << (i + 1) << ": "
-    //               << "Call = " << call << ", Put = " << put << std::endl;
+        double mean = optionPricing.monteCarlo(el.optionType, el.stockData[0], el.stockData[1], el.stockData[2], el.stockData[3], el.stockData[4], N, el.optionName + ".out");
 
-    //     cout << "monteCarloCall: " << monteCarloCall << " " << "monteCarloPut: " << monteCarloPut << "\n";
-    // }
+        cout << mean << "\n";
+    }
 
     return 0;
 }
@@ -42,6 +55,7 @@ int main(int argc, char *argv[])
 vector<dataFormat> readData(char *fileName)
 {
     ifstream file(fileName);
+    // ifstream file("data.in");
 
     vector<dataFormat> data;
     const char pattern = ' ';
@@ -70,7 +84,7 @@ vector<dataFormat> readData(char *fileName)
         }
         // formating input
 
-        if (result[0] == "CALL")
+        if (result[0][0] == 'C' || result[0][0] == 'c')
             dataRow.optionType = CALL;
         else
             dataRow.optionType = PUT;
