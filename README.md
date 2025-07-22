@@ -10,6 +10,9 @@ Visualize results with matplotlib in Python
 To get a local copy up and running, follow these simple steps.
 
 ## Prerequisites
+
+Python 3.12
+
 C++ Compiler: A C++11 compatible compiler (or newer, e.g., C++17 recommended).
 
 g++ (GNU C++ Compiler)
